@@ -24,3 +24,12 @@ Finally, create and start the Docker container using docker-compose:
 ```bash
 docker compose up -d
 ```
+
+## 4. settings `/etc/hosts`
+
+```sh
+127.0.0.1 mongo-primary
+127.0.0.1 mongo-secondary1
+127.0.0.1 mongo-secondary2
+127.0.0.1 mongo-arbiter
+```
