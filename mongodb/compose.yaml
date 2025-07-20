@@ -8,10 +8,10 @@ services:
       MONGO_REPLICA_SET_NAME: ${MONGO_REPLICA_SET_NAME}
       MONGO_AUTH_DB: ${MONGO_AUTH_DB}
     ports:
-      - ${MONGO_PRIMARY_PORT}:${MONGO_PRIMARY_PORT}
+      - "127.0.0.1:${MONGO_PRIMARY_PORT}:${MONGO_PRIMARY_PORT}"
     volumes:
       - mongo-primary-data:/data/db
-      - ./keyfile:/etc/mongo/keyfile
+      - ./keyfile:/etc/mongo/keyfile:ro
     networks:
       - mongo-cluster
     command:
@@ -21,9 +21,11 @@ services:
         "${MONGO_REPLICA_SET_NAME}",
         "--keyFile",
         "/etc/mongo/keyfile",
-        "--bind_ip_all",
+        "--bind_ip",
+        "127.0.0.1,mongo-primary",
         "--port",
         "${MONGO_PRIMARY_PORT}",
+        --auth,
       ]
     restart: always
     healthcheck:
@@ -41,10 +43,10 @@ services:
       MONGO_REPLICA_SET_NAME: ${MONGO_REPLICA_SET_NAME}
       MONGO_AUTH_DB: ${MONGO_AUTH_DB}
     ports:
-      - ${MONGO_SECONDARY1_PORT}:${MONGO_SECONDARY1_PORT}
+      - "127.0.0.1:${MONGO_SECONDARY1_PORT}:${MONGO_SECONDARY1_PORT}"
     volumes:
       - mongo-secondary1-data:/data/db
-      - ./keyfile:/etc/mongo/keyfile
+      - ./keyfile:/etc/mongo/keyfile:ro
     networks:
       - mongo-cluster
     command:
@@ -54,9 +56,11 @@ services:
         "${MONGO_REPLICA_SET_NAME}",
         "--keyFile",
         "/etc/mongo/keyfile",
-        "--bind_ip_all",
+        "--bind_ip",
+        "127.0.0.1,mongo-secondary1",
         "--port",
         "${MONGO_SECONDARY1_PORT}",
+        --auth,
       ]
     restart: always
     healthcheck:
@@ -74,10 +78,10 @@ services:
       MONGO_REPLICA_SET_NAME: ${MONGO_REPLICA_SET_NAME}
       MONGO_AUTH_DB: ${MONGO_AUTH_DB}
     ports:
-      - ${MONGO_SECONDARY2_PORT}:${MONGO_SECONDARY2_PORT}
+      - "127.0.0.1:${MONGO_SECONDARY2_PORT}:${MONGO_SECONDARY2_PORT}"
     volumes:
       - mongo-secondary2-data:/data/db
-      - ./keyfile:/etc/mongo/keyfile
+      - ./keyfile:/etc/mongo/keyfile:ro
     networks:
       - mongo-cluster
     command:
@@ -87,9 +91,11 @@ services:
         "${MONGO_REPLICA_SET_NAME}",
         "--keyFile",
         "/etc/mongo/keyfile",
-        "--bind_ip_all",
+        "--bind_ip",
+        "127.0.0.1,mongo-secondary2",
         "--port",
         "${MONGO_SECONDARY2_PORT}",
+        --auth,
       ]
     restart: always
     healthcheck:
@@ -107,9 +113,9 @@ services:
       MONGO_REPLICA_SET_NAME: ${MONGO_REPLICA_SET_NAME}
       MONGO_AUTH_DB: ${MONGO_AUTH_DB}
     ports:
-      - ${MONGO_ARBITER_PORT}:${MONGO_ARBITER_PORT}
+      - "127.0.0.1:${MONGO_ARBITER_PORT}:${MONGO_ARBITER_PORT}"
     volumes:
-      - ./keyfile:/etc/mongo/keyfile
+      - ./keyfile:/etc/mongo/keyfile:ro
     networks:
       - mongo-cluster
     command:
@@ -119,9 +125,11 @@ services:
         "${MONGO_REPLICA_SET_NAME}",
         "--keyFile",
         "/etc/mongo/keyfile",
-        "--bind_ip_all",
+        "--bind_ip",
+        "127.0.0.1,mongo-arbiter",
         "--port",
         "${MONGO_ARBITER_PORT}",
+        --auth,
       ]
     restart: always
     healthcheck:
@@ -139,9 +147,9 @@ services:
       MONGO_REPLICA_SET_NAME: ${MONGO_REPLICA_SET_NAME}
       MONGO_AUTH_DB: ${MONGO_AUTH_DB}
     volumes:
-      - ./keyfile:/etc/mongo/keyfile
-      - ./init.sh:/docker-entrypoint-initdb.d/init.sh
-      - ./.env:/docker-entrypoint-initdb.d/.env
+      - ./keyfile:/etc/mongo/keyfile:ro
+      - ./init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+      - ./.env:/docker-entrypoint-initdb.d/.env:ro
     networks:
       - mongo-cluster
     depends_on:
@@ -167,7 +175,7 @@ services:
       ME_CONFIG_MONGODB_SERVER: ${MONGO_EXPRESS_TARGET_DB}
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo-primary:${MONGO_PRIMARY_PORT}
     ports:
-      - ${MONGO_EXPRESS_PORT}:8081
+      - "127.0.0.1:${MONGO_EXPRESS_PORT}:8081"
     depends_on:
       mongo-primary:
         condition: service_healthy
