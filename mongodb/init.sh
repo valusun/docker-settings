@@ -10,7 +10,7 @@ fi
 # update packages
 apt-get update
 
-# replicasetい
+# replicaset
 mongosh --host mongo-primary --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase ${MONGO_AUTH_DB} --eval "rs.initiate({
   _id: '${MONGO_REPLICA_SET_NAME}',
   members: [
